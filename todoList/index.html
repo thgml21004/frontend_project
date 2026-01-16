@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FrontEnd Project_Todo List</title>
+    <script defer>
+        window.onload = function () {
+            const input = document.querySelector('input');
+            const button = document.querySelector('button');
+            const listBox = document.querySelector('ul');
+            const countTag = document.getElementById('count');
+            const listTag = document.getElementsByTagName('li');
+
+
+            // 할일 개수
+            const updateCount = () => {
+                const count = document.querySelectorAll('input[type="checkbox"]:checked');
+                countTag.textContent = listTag.length - count.length;
+            }
+
+            // 할일 추가
+            button.addEventListener('click', () => {
+                const list = document.createElement('li');
+                const checkbox = document.createElement('input');
+                const text = document.createElement('span');
+                const deleteButton = document.createElement('button');
+                const buttonText = document.createTextNode('삭제');
+
+                // 할일 추가
+                listBox.appendChild(list); // li 태그 추가
+                checkbox.type = 'checkbox'; // input type 추가
+                checkbox.className = 'checkbox';
+                list.appendChild(checkbox); // input checkbox 추가
+                text.innerText = input.value; // input 입력문구 li태그에 가져오기
+                list.appendChild(text); // span 태그 추가
+                deleteButton.appendChild(buttonText);
+                list.appendChild(deleteButton); // 삭제 버튼 추가
+
+                input.value = ''; // 추가 후 입력한 input 태그 공백
+
+                updateCount();
+
+                // 할일 checkbox
+                checkbox.addEventListener('change', () => {
+                    if(checkbox.checked) {
+                        list.style.color = 'gray';
+                        list.style.textDecoration = 'line-through';
+
+                        updateCount();
+                    } else {
+                        list.style.color = 'black';
+                        list.style.textDecoration = 'none';
+                        updateCount();
+                    }
+                });
+
+                // 할일 삭제
+                deleteButton.addEventListener('click', () => {
+                    list.remove();
+
+                    updateCount();
+                });
+
+            });
+        }
+    </script>
+</head>
+<body>
+<div class="list-box">
+    <h1>Todo List</h1>
+    <div class="input">
+        <input type="text" placeholder="할 일을 입력하세요." />
+        <button>Add</button>
+    </div>
+    <div class="list">
+        <ul>
+        </ul>
+    </div>
+    <div class="bottom">
+        남은 할일 : <span id="count">0</span>
+    </div>
+</div>
+</body>
+</html>
