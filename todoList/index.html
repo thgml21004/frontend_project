@@ -5,12 +5,32 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FrontEnd Project_Todo List</title>
     <script defer>
-        window.onload = function () {
+        window.onload = function () { // 브라우저 랜더링이 완료 됐을 때, 태그를 변수에 담기전 대기상태
             const input = document.querySelector('input');
             const button = document.querySelector('button');
-            const listBox = document.querySelector('ul');
+            let listBox = document.querySelector('ul');
             const countTag = document.getElementById('count');
             const listTag = document.getElementsByTagName('li');
+            const allDelBtn = document.getElementById('allDeleteBtn');
+            const allFilter = document.getElementById('all');
+            const doneFilter = document.getElementById('done');
+            const ingFilter = document.getElementById('ing');
+
+            let todoArray = [];
+
+            function getDataLocal() {
+                const local = localStorage.getItem('todo', JSON.stringify(todoArray));
+                const userData = JSON.parse(local);
+
+                if (userData) {
+                    for (let i = 0; i < userData.length; i++) {
+                        let element = document.createElement('li');
+
+                        element.innerHTML = userData[i];
+                        listBox.appendChild(element);
+                    }
+                }
+            }
 
 
             // 할일 개수
@@ -19,8 +39,7 @@
                 countTag.textContent = listTag.length - count.length;
             }
 
-            // 할일 추가
-            button.addEventListener('click', () => {
+            function addList() {
                 const list = document.createElement('li');
                 const checkbox = document.createElement('input');
                 const text = document.createElement('span');
@@ -31,6 +50,7 @@
                 listBox.appendChild(list); // li 태그 추가
                 checkbox.type = 'checkbox'; // input type 추가
                 checkbox.className = 'checkbox';
+                list.classList.add('ing');
                 list.appendChild(checkbox); // input checkbox 추가
                 text.innerText = input.value; // input 입력문구 li태그에 가져오기
                 list.appendChild(text); // span 태그 추가
@@ -40,18 +60,29 @@
                 input.value = ''; // 추가 후 입력한 input 태그 공백
 
                 updateCount();
+                todoArray.push(list.innerHTML);
+                saveDataLocal();
 
                 // 할일 checkbox
                 checkbox.addEventListener('change', () => {
                     if(checkbox.checked) {
                         list.style.color = 'gray';
                         list.style.textDecoration = 'line-through';
+                        list.classList.add('done');
+                        list.classList.remove('ing');
 
                         updateCount();
+                        todoArray.push(list.innerHTML);
+                        saveDataLocal();
                     } else {
                         list.style.color = 'black';
                         list.style.textDecoration = 'none';
+                        list.classList.remove('done');
+                        list.classList.add('ing');
+
                         updateCount();
+                        todoArray.push(list.innerHTML);
+                        saveDataLocal();
                     }
                 });
 
@@ -60,24 +91,88 @@
                     list.remove();
 
                     updateCount();
+                    todoArray.push(list.innerHTML);
+                    saveDataLocal();
                 });
+            }
 
+            // 필터
+            allFilter.addEventListener('click', () => {
+                const liTag = document.querySelectorAll('li');
+                liTag.forEach(li => {
+                    li.style.display = 'block';
+                });
             });
+
+            doneFilter.addEventListener('click', () => {
+                const liTag = document.querySelectorAll('li');
+                liTag.forEach(li => {
+                    if (li.classList.contains('done')) {
+                        li.style.display = 'block';
+                    } else {
+                        li.style.display = 'none';
+                    }
+                });
+            });
+
+            ingFilter.addEventListener('click', () => {
+                const liTag = document.querySelectorAll('li');
+                liTag.forEach(liTag => {
+                    if (liTag.classList.contains('ing')) {
+                        liTag.style.display = 'block';
+                    } else {
+                        liTag.style.display = 'none';
+                    }
+                });
+            });
+
+            // enter 등록
+            input.addEventListener('keyup', (e)=> {
+                if (e.key === 'Enter' || e.keyCode === 13) {
+                    button.click(() => {
+                        addList();
+                    })
+                }
+            })
+
+            // 버튼 click 등록
+            button.addEventListener('click', () => {
+                addList();
+            });
+
+            // 전체 삭제
+            allDelBtn.addEventListener('click', () => {
+                listBox.innerHTML = '';
+
+                updateCount();
+                saveDataLocal();
+            });
+
+            function saveDataLocal() {
+                localStorage.setItem('todo', JSON.stringify(todoArray));
+            }
+
+            getDataLocal();
+            updateCount();
         }
     </script>
 </head>
 <body>
 <div class="list-box">
     <h1>Todo List</h1>
-    <div class="input">
+    <div class="text-box">
         <input type="text" placeholder="할 일을 입력하세요." />
         <button>Add</button>
     </div>
-    <div class="list">
-        <ul>
+    <div class="list-box">
+        <button id="all">전체</button>
+        <button id="done">완료</button>
+        <button id="ing">미완료</button>
+        <ul id="todoBox">
         </ul>
+        <button id="allDeleteBtn">All Delete</button>
     </div>
-    <div class="bottom">
+    <div>
         남은 할일 : <span id="count">0</span>
     </div>
 </div>
