@@ -16,6 +16,9 @@
             const doneFilter = document.getElementById('done');
             const ingFilter = document.getElementById('ing');
 
+            const DONE_TYPE = 'SUCCESS';
+            const ING_TYPE = 'ING';
+
             let todoArray = [];
 
             function getDataLocal() {
@@ -28,6 +31,9 @@
 
                         element.innerHTML = userData[i];
                         listBox.appendChild(element);
+
+                        //checkbox, 삭제 버튼의 이벤트를 가지고 온다.
+
                     }
                 }
             }
@@ -50,7 +56,7 @@
                 listBox.appendChild(list); // li 태그 추가
                 checkbox.type = 'checkbox'; // input type 추가
                 checkbox.className = 'checkbox';
-                list.classList.add('ing');
+                list.classList.add(ING_TYPE);
                 list.appendChild(checkbox); // input checkbox 추가
                 text.innerText = input.value; // input 입력문구 li태그에 가져오기
                 list.appendChild(text); // span 태그 추가
@@ -68,8 +74,8 @@
                     if(checkbox.checked) {
                         list.style.color = 'gray';
                         list.style.textDecoration = 'line-through';
-                        list.classList.add('done');
-                        list.classList.remove('ing');
+                        list.classList.add(DONE_TYPE);
+                        list.classList.remove(ING_TYPE);
 
                         updateCount();
                         todoArray.push(list.innerHTML);
@@ -77,8 +83,8 @@
                     } else {
                         list.style.color = 'black';
                         list.style.textDecoration = 'none';
-                        list.classList.remove('done');
-                        list.classList.add('ing');
+                        list.classList.remove(DONE_TYPE);
+                        list.classList.add(ING_TYPE);
 
                         updateCount();
                         todoArray.push(list.innerHTML);
@@ -107,31 +113,21 @@
             doneFilter.addEventListener('click', () => {
                 const liTag = document.querySelectorAll('li');
                 liTag.forEach(li => {
-                    if (li.classList.contains('done')) {
-                        li.style.display = 'block';
-                    } else {
-                        li.style.display = 'none';
-                    }
+                    li.style.display = li.classList.contains(DONE_TYPE) ? 'block' : 'none';
                 });
             });
 
             ingFilter.addEventListener('click', () => {
                 const liTag = document.querySelectorAll('li');
                 liTag.forEach(liTag => {
-                    if (liTag.classList.contains('ing')) {
-                        liTag.style.display = 'block';
-                    } else {
-                        liTag.style.display = 'none';
-                    }
+                    liTag.style.display = liTag.classList.contains(ING_TYPE) ? 'block' : 'none';
                 });
             });
 
             // enter 등록
             input.addEventListener('keyup', (e)=> {
                 if (e.key === 'Enter' || e.keyCode === 13) {
-                    button.click(() => {
-                        addList();
-                    })
+                    addList();
                 }
             })
 
@@ -145,6 +141,7 @@
                 listBox.innerHTML = '';
 
                 updateCount();
+                todoArray = [];
                 saveDataLocal();
             });
 
